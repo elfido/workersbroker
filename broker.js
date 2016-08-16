@@ -9,7 +9,12 @@ var BrokerMngr = {
     notifyMaster: function(msg){
         let message = {};
         message[options.namespace] = msg;
-        process.send( message );
+        try{
+            process.send( message );
+        }
+        catch(e){
+            console.error("Error sending notification to master, perhaps you are running in a single node?", e.message);
+        }
     },
     handle: function(msg){
         if (msg[options.namespace]){
