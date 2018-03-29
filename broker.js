@@ -6,6 +6,7 @@ var cluster = require("cluster"),
     }
 
 var BrokerMngr = {
+    workers: null,
     notifyMaster: function(msg){
         let message = {};
         message[options.namespace] = msg;
@@ -44,6 +45,17 @@ var BrokerMngr = {
                     BrokerMngr.workerHandlers[message](args);
                 }
             }
+        }
+    },
+    getWorkers(){
+        if (BrokerMngr.workers === null){
+            BrokerMngr.workers = Object.keys(cluster.workers);
+        }
+        return BrokerMngr.workers;
+    },
+    broadcast: function(message){
+        if (BrokerMngr.isCluster()){
+            BrokerMngr.getWorkers().forEach( (k)=> cluster.workers[k].send(message) );
         }
     },
     notifyAll: function(msg){
