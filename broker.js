@@ -7,7 +7,16 @@ var cluster = require("cluster"),
 
 var BrokerMngr = {
     workers: null,
+
+    isSingleNode() {
+        return typeof process.send !== 'function';
+    },
+
     notifyMaster: function(msg){
+        if (BrokerMngr.isSingleNode()){
+            return;
+        }
+
         let message = {};
         message[options.namespace] = msg;
         try{
